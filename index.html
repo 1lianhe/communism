@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>中国共产主义青年交流站</title>
+  <style>
+    /* ========== 全局样式 ========== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: #fafafa;
+      color: #1a1a1a;
+      line-height: 1.7;
+    }
+
+    /* ========== 顶部横幅 ========== */
+    .top-banner {
+      background: #8b0000;
+      color: #fff;
+      text-align: center;
+      padding: 12px 15px;
+      font-size: 1.2rem;
+      letter-spacing: 0.1em;
+    }
+    .top-banner span { margin: 0 8px; }
+
+    /* ========== 导航栏（暗红色，横向） ========== */
+    .navbar {
+      background: #7a0000;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 15px;
+      height: 50px;
+    }
+    .navbar a {
+      color: #fff;
+      text-decoration: none;
+      padding: 8px 20px;
+      margin: 0 5px;
+      font-size: 1rem;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .navbar a:hover { color: #ffd700; border-bottom-color: #ffd700; }
+    .navbar a.active { color: #ffd700; border-bottom-color: #ffd700; }
+
+    /* ========== 主内容容器 ========== */
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+
+    /* ========== 预留文字区域 ========== */
+    .custom-text {
+      border: 1px dashed #8b0000;
+      background: #fff8f8;
+      padding: 15px 20px;
+      border-radius: 6px;
+      margin-bottom: 30px;
+    }
+    .custom-text::before {
+      content: "✍️ 在此修改文字";
+      display: block;
+      color: #8b0000;
+      font-weight: bold;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+    }
+
+    /* ========== 标题 ========== */
+    h1 { font-size: 2rem; color: #8b0000; margin-bottom: 10px; }
+    h2 { font-size: 1.5rem; color: #8b0000; margin: 30px 0 15px; }
+
+    /* ========== 名言卡片 ========== */
+    .quotes {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .quote-card {
+      background: #fff;
+      border-left: 4px solid #8b0000;
+      padding: 18px;
+      border-radius: 0 6px 6px 0;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .quote-card blockquote { font-style: italic; margin-bottom: 8px; color: #333; }
+    .quote-author { text-align: right; font-weight: bold; color: #8b0000; font-size: 0.9rem; }
+
+    /* ========== 书目列表 ========== */
+    .book-list { list-style: none; }
+    .book-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 15px;
+      background: #fff;
+      border: 1px solid #e5e5e5;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+
+    /* ========== 文艺卡片 ========== */
+    .art-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    .art-card {
+      background: #fff;
+      border: 1px solid #e5e5e5;
+      border-radius: 6px;
+      padding: 20px;
+      text-align: center;
+    }
+    .art-card h3 { color: #8b0000; font-size: 1.1rem; margin-bottom: 8px; }
+    .art-card p { font-size: 0.9rem; color: #555; }
+
+    /* ========== 图片槽位网格 ========== */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .gallery-slot {
+      aspect-ratio: 1 / 1;
+      background: #fff;
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+    }
+    .gallery-slot span {
+      color: #bbb;
+      font-size: 0.9rem;
+    }
+    .gallery-slot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* ========== 图片弹窗 ========== */
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    .lightbox.active { display: flex; }
+    .lightbox img {
+      max-width: 90%;
+      max-height: 75%;
+      border-radius: 8px;
+      object-fit: contain;
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 20px; right: 30px;
+      color: #fff;
+      font-size: 2rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .lightbox-save {
+      margin-top: 20px;
+      padding: 10px 25px;
+      background: #8b0000;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .lightbox-save:hover { background: #a00000; }
+
+    /* ========== 页脚 ========== */
+    .footer {
+      text-align: center;
+      padding: 25px 20px;
+      color: #777;
+      font-size: 0.8rem;
+      border-top: 1px solid #ddd;
+      margin-top: 40px;
+    }
+
+    /* ========== 区块显示控制 ========== */
+    .page-section { display: none; }
+    .page-section.active { display: block; }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== 顶部横幅 ==================== -->
+  <div class="top-banner">
+    <span>☭</span> 中国共产主义青年交流站 <span>☭</span>
+  </div>
+
+  <!-- ==================== 导航栏 ==================== -->
+  <nav class="navbar">
+    <a class="nav-link active" data-target="home">主页</a>
+    <a class="nav-link" data-target="articles">文章文艺</a>
+    <!-- 修改图片分区名称：把“图片”改成你想要的名字，同时修改下方区块标题 -->
+    <a class="nav-link" data-target="gallery">图片</a>
+  </nav>
+
+  <!-- ==================== 主内容 ==================== -->
+  <div class="container">
+
+    <!-- ========== 主页区块 ========== -->
+    <div id="home" class="page-section active">
+      <!-- 预留文字区域：在这里修改你的公告或简介 -->
+      <div class="custom-text">
+        欢迎来到中国共产主义青年交流站！这里是青年学习、交流和成长的平台。你可以在此处添加公告、最新动态或任何你想要展示的文字。
+      </div>
+
+      <h1>中国共产主义青年交流站</h1>
+      <p style="color:#555;">学习马克思主义，传承红色基因，争做时代新人</p>
+
+      <!-- 导师名言（六位导师） -->
+      <div class="quotes">
+        <div class="quote-card">
+          <blockquote>“世界是你们的，也是我们的，但是归根结底是你们的。你们青年人朝气蓬勃，正在兴旺时期，好像早晨八九点钟的太阳。希望寄托在你们身上。”</blockquote>
+          <div class="quote-author">—— 毛泽东</div>
+        </div>
+        <div class="quote-card">
+          <blockquote>“青春的光辉，理想的钥匙，生命的意义，乃至人类的生存、发展，全包含在这两个字之中：奋斗！”</blockquote>
+          <div class="quote-author">—— 马克思</div>
+        </div>
+        <div class="quote-card">
+          <blockquote>“我们的事业是正义的，正义的事业是任何敌人也攻不破的。”</blockquote>
+          <div class="quote-author">—— 恩格斯</div>
+        </div>
+        <div class="quote-card">
+          <blockquote>“青年应当有朝气，敢作为。”</blockquote>
+          <div class="quote-author">—— 斯大林</div>
+        </div>
+        <div class="quote-card">
+          <blockquote>“为中华之崛起而读书。”</blockquote>
+          <div class="quote-author">—— 周恩来</div>
+        </div>
+        <div class="quote-card">
+          <blockquote>“要成就一件大事业，必须从小事做起。”</blockquote>
+          <div class="quote-author">—— 列宁</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 文章文艺区块 ========== -->
+    <div id="articles" class="page-section">
+      <h2>文章</h2>
+      <ul class="book-list">
+        <li class="book-item">共产党宣言</li>
+        <li class="book-item">资本论</li>
+        <li class="book-item">矛盾论</li>
+        <li class="book-item">实践论</li>
+        <li class="book-item">毛泽东选集</li>
+      </ul>
+
+      <h2>文艺</h2>
+      <div class="art-cards">
+        <div class="art-card">
+          <h3>🎵 革命歌曲</h3>
+          <p>《国际歌》《东方红》《歌唱祖国》等</p>
+        </div>
+        <div class="art-card">
+          <h3>📚 红色文学</h3>
+          <p>《红岩》《青春之歌》《林海雪原》等</p>
+        </div>
+        <div class="art-card">
+          <h3>🎨 美术作品</h3>
+          <p>革命历史题材绘画、海报、宣传画等</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 图片区块 ========== -->
+    <div id="gallery" class="page-section">
+      <h2>图片</h2>
+      <p style="color:#777; margin-bottom:15px;">点击图片查看大图，弹窗中可保存图片到本地。</p>
+      <div class="gallery">
+        <!-- 槽位 1 -->
+        <div class="gallery-slot">
+          <span>图片 1</span>
+          <!-- 添加图片时，删除上面 <span> 行，并取消下面 <img> 注释，填入图片路径
+          <img src="images/photo1.jpg" alt="图片1">
+          -->
+        </div>
+        <!-- 槽位 2 -->
+        <div class="gallery-slot">
+          <span>图片 2</span>
+          <!-- <img src="images/photo2.jpg" alt="图片2"> -->
+        </div>
+        <!-- 槽位 3 -->
+        <div class="gallery-slot">
+          <span>图片 3</span>
+          <!-- <img src="images/photo3.jpg" alt="图片3"> -->
+        </div>
+        <!-- 槽位 4 -->
+        <div class="gallery-slot">
+          <span>图片 4</span>
+          <!-- <img src="images/photo4.jpg" alt="图片4"> -->
+        </div>
+        <!-- 槽位 5 -->
+        <div class="gallery-slot">
+          <span>图片 5</span>
+          <!-- <img src="images/photo5.jpg" alt="图片5"> -->
+        </div>
+        <!-- 槽位 6 -->
+        <div class="gallery-slot">
+          <span>图片 6</span>
+          <!-- <img src="images/photo6.jpg" alt="图片6"> -->
+        </div>
+        <!-- 槽位 7 -->
+        <div class="gallery-slot">
+          <span>图片 7</span>
+          <!-- <img src="images/photo7.jpg" alt="图片7"> -->
+        </div>
+        <!-- 槽位 8 -->
+        <div class="gallery-slot">
+          <span>图片 8</span>
+          <!-- <img src="images/photo8.jpg" alt="图片8"> -->
+        </div>
+        <!-- 槽位 9 -->
+        <div class="gallery-slot">
+          <span>图片 9</span>
+          <!-- <img src="images/photo9.jpg" alt="图片9"> -->
+        </div>
+        <!-- 槽位 10 -->
+        <div class="gallery-slot">
+          <span>图片 10</span>
+          <!-- <img src="images/photo10.jpg" alt="图片10"> -->
+        </div>
+        <!-- 槽位 11 -->
+        <div class="gallery-slot">
+          <span>图片 11</span>
+          <!-- <img src="images/photo11.jpg" alt="图片11"> -->
+        </div>
+        <!-- 槽位 12 -->
+        <div class="gallery-slot">
+          <span>图片 12</span>
+          <!-- <img src="images/photo12.jpg" alt="图片12"> -->
+        </div>
+        <!-- 槽位 13 -->
+        <div class="gallery-slot">
+          <span>图片 13</span>
+          <!-- <img src="images/photo13.jpg" alt="图片13"> -->
+        </div>
+        <!-- 槽位 14 -->
+        <div class="gallery-slot">
+          <span>图片 14</span>
+          <!-- <img src="images/photo14.jpg" alt="图片14"> -->
+        </div>
+        <!-- 槽位 15 -->
+        <div class="gallery-slot">
+          <span>图片 15</span>
+          <!-- <img src="images/photo15.jpg" alt="图片15"> -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==================== 图片弹窗 ==================== -->
+  <div class="lightbox" id="lightbox">
+    <span class="lightbox-close" id="lightboxClose">&times;</span>
+    <img src="" alt="大图" id="lightboxImg">
+    <button class="lightbox-save" id="lightboxSave">保存图片</button>
+  </div>
+
+  <!-- ==================== 页脚 ==================== -->
+  <footer class="footer">
+    <p>中国共产主义青年交流站 · 仅供学习交流，请勿用于商业用途</p>
+    <p>Copyright © 2026</p>
+  </footer>
+
+  <!-- ==================== JavaScript ==================== -->
+  <script>
+    // 导航切换
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('.page-section');
+    navLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        navLinks.forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+        sections.forEach(sec => sec.classList.remove('active'));
+        document.getElementById(this.getAttribute('data-target')).classList.add('active');
+      });
+    });
+
+    // 图片弹窗逻辑
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxClose = document.getElementById('lightboxClose');
+    const lightboxSave = document.getElementById('lightboxSave');
+
+    // 点击图片打开弹窗（事件委托，动态添加的图片也能用）
+    document.querySelector('.gallery').addEventListener('click', function(e) {
+      const img = e.target.closest('img');
+      if (img) {
+        lightboxImg.src = img.src;
+        lightbox.classList.add('active');
+      }
+    });
+
+    // 关闭弹窗
+    lightboxClose.addEventListener('click', () => lightbox.classList.remove('active'));
+    lightbox.addEventListener('click', function(e) {
+      if (e.target === lightbox) lightbox.classList.remove('active');
+    });
+
+    // 保存图片
+    lightboxSave.addEventListener('click', function() {
+      const link = document.createElement('a');
+      link.href = lightboxImg.src;
+      link.download = lightboxImg.src.split('/').pop(); // 使用原文件名
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+  </script>
+
+</body>
+</html>
